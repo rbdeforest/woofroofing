@@ -61,6 +61,9 @@ export default function Home() {
         s = d.suggestions[0];
         if (!s) throw new Error("We couldn't find that address. Try picking one from the list.");
       }
+            // Save the email; fire-and-forget so it never slows down or blocks the quote.
+      fetch("/api/lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }), keepalive: true }).catch(() => {});
+
       setPlace(null);
       setRoof(null);
       setImgLoaded(false);
@@ -116,13 +119,12 @@ export default function Home() {
               <form className="quote-form" onSubmit={generate}>
                 <label htmlFor="address">Property Address</label>
                 <AddressSearch inputRef={addrInput} onChange={(picked, text, session) => (addr.current = { picked, text, session })} />
-                <label htmlFor="email">Email Address</label>
+                <label htmlFor="email">Where should we send your quote?</label>
                 <div className="field">
                   <svg className="field-icon" viewBox="0 0 24 24" aria-hidden="true">
                     <rect x="3" y="5" width="18" height="14" rx="2" />
                     <path d="m3 7 9 6 9-6" />
                   </svg>
-                  {/* Not stored or sent anywhere yet; wired up at go-live. */}
                   <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" />
                 </div>
                 <button className="primary" type="submit">
